@@ -21,11 +21,11 @@ export CXX=${mycxx}
 export CFLAGS=${mycflags}
 export CXXFLAGS=${mycxxflags}
 
-./bootstrap.sh --prefix=${builddir}/boost_1_63 link=static --without-libraries=python
+./bootstrap.sh --prefix=${builddir}/boost_1_63 --without-libraries=python
 ./b2 -j${PARALLEL_BUILD}
 ./b2 install
 
-# ./bootstrap.sh --prefix=${builddir}/boost_1_63 link=static --without-libraries=python
+# ./bootstrap.sh --prefix=${builddir}/boost_1_63 --without-libraries=python
 # ./b2 -j16 variant=debug
 # ./b2 install
 

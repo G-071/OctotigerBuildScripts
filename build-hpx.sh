@@ -22,9 +22,9 @@ mkdir -p $builddir/hpx
 cd $builddir/hpx
 
 if [ ${malloc} == "jemalloc" ] ; then
-    alloc_opts="-DJEMALLOC_ROOT=${basedir}/${builddir}/contrib -DHPX_WITH_MALLOC=jemalloc"
+    alloc_opts="-DJEMALLOC_ROOT=${builddir}/contrib -DHPX_WITH_MALLOC=jemalloc"
 else
-    alloc_opts="-DTCMALLOC_ROOT=${basedir}/${builddir}/contrib -DHPX_WITH_MALLOC=tcmalloc"
+    alloc_opts="-DTCMALLOC_ROOT=${builddir}/contrib -DHPX_WITH_MALLOC=tcmalloc"
 fi
 
 cmake -DCMAKE_TOOLCHAIN_FILE=${hpxtoolchain}                                        \
