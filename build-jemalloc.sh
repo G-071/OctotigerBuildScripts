@@ -28,5 +28,5 @@ fi
 cd build
 ../configure --prefix=${builddir}/contrib --enable-shared=no --enable-static=yes
 make -j${PARALLEL_BUILD}
-make install
+make install_include install_lib
 cd $basedir

@@ -16,17 +16,22 @@ if [[ `echo $HOSTNAME | grep tave` ]]; then
     export mycflags="-fPIC -march=knl -ffast-math"
     export mycxxflags="-fPIC -march=knl -ffast-math"
     export myldflags="-fPIC"
-    export HPX_ENABLE_MPI=OFF
+    export HPX_ENABLE_MPI=ON
 else
     echo "other machine";
     export myarch=cpu
     export mycflags="-fPIC -march=native -ffast-math"
     export mycxxflags="-fPIC -march=native -ffast-math"
     export myldflags="-fPIC"
-    export HPX_ENABLE_MPI=ON
+    export HPX_ENABLE_MPI=OFF
 fi
 
-export buildtype=Release
+if [[ ! -z $1 ]]; then
+    export buildtype=$1
+else
+    export buildtype=Release
+fi
+echo "build type: $buildtype"
 export malloc=jemalloc
 
 export basedir=$PWD
