@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+set -x
 
 source source-me.sh
 
