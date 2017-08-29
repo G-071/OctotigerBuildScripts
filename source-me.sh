@@ -7,7 +7,7 @@ if [[ `echo $HOSTNAME | grep tave` ]]; then
     echo "compiling for tave, doing additional setup";
     module load craype-mic-knl
     module switch PrgEnv-cray/6.0.3 PrgEnv-gnu
-    module load CMake/3.6.2
+    module load CMake/3.8.1
     
     export myarch=${CRAY_CPU_TARGET}
     export hpxtoolchain=${basedir}/src/hpx/cmake/toolchains/CrayKNL.cmake
