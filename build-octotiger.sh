@@ -2,10 +2,14 @@
 set -e
 set -x
 
-if [ -z ${basedir+x} ] ; then
-    echo "basedir is not set. Please source sourceme.sh";
-    kill -INT $$
+if [ -z ${octotiger_source_me_sources} ] ; then
+    source source-me.sh
 fi
+
+# if [ -z ${basedir+x} ] ; then
+#     echo "basedir is not set. Please source sourceme.sh";
+#     kill -INT $$
+# fi
 
 cd ${basedir}/src
 if [ ! -d octotiger ] ; then

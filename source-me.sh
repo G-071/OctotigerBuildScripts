@@ -27,9 +27,15 @@ else
 fi
 
 if [[ ! -z $1 ]]; then
+    if [[ ! ("$1" == "Release" || "$1" == "RelWithDebInfo" || "$1" == "Debug") ]]; then
+    echo "build type invalid: valid are Release, RelWithDebInfo and Debug"
+    kill -INT $$
+    fi
     export buildtype=$1
 else
-    export buildtype=Release
+    echo "no build type specified: specify either Release, RelWithDebInfo or Debug"
+    kill -INT $$
+    # export buildtype=Release
 fi
 echo "build type: $buildtype"
 export malloc=jemalloc
@@ -43,6 +49,8 @@ export mycxx=g++
 export myfc=gfortran
 
 mkdir -p src
+
+export octotiger_source_me_sources=1
 
 echo ""
 echo "NB: "
