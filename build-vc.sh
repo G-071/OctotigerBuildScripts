@@ -10,7 +10,7 @@ fi
 cd ${basedir}/src
 if [ ! -d Vc ] ; then
     # git clone git@github.com:VcDevel/Vc.git
-    git clone https://github.com/STEllAR-GROUP/Vc.git
+    git clone git@github.com:STEllAR-GROUP/Vc.git
     cd Vc
     git checkout pfandedd_inlining_AVX512
     cd ..

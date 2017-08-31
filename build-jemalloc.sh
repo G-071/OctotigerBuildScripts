@@ -26,7 +26,12 @@ if [ ! -d build ] ; then
     mkdir build
 fi
 cd build
-../configure --prefix=${builddir}/contrib --enable-shared=no --enable-static=yes
+
+if [[ "$buildtype" == "RelWithDebInfo" || "$buildtype" == "Debug" ]]; then
+    jemalloc_debug="--enable-debug --enable-fill"
+fi
+
+../configure --prefix=${builddir}/contrib $jemalloc_debug
 make -j${PARALLEL_BUILD}
 make install_include install_lib
 cd $basedir

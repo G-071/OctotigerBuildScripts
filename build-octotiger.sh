@@ -15,7 +15,7 @@ if [ ! -d octotiger ] ; then
     cd ..
 fi
 cd octotiger
-git pull
+# git pull
 
 mkdir -p $builddir/octotiger
 cd $builddir/octotiger
