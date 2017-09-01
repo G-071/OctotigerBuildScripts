@@ -33,7 +33,7 @@ fi
 
 cmake -DCMAKE_TOOLCHAIN_FILE=${hpxtoolchain}                                        \
       -DCMAKE_BUILD_TYPE=$buildtype                                                 \
-      -DCMAKE_EXPORT_COMPILE_COMMANDS=1                                             \
+      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON                                            \
       -DHPX_WITH_THREAD_IDLE_RATES=ON                                               \
       -DHPX_WITH_DISABLED_SIGNAL_EXCEPTION_HANDLERS=ON                              \
       -DHPX_WITH_PARCELPORT_MPI=${HPX_ENABLE_MPI}                                   \
