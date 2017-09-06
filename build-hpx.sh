@@ -15,7 +15,8 @@ cd ${basedir}/src
 if [ ! -d hpx ] ; then
     git clone git@github.com:STEllAR-GROUP/hpx.git
     cd hpx
-    git checkout 1.0.0
+    # git checkout 1.0.0
+    git checkout cuda_clang
     cd ..
 fi
 # cd hpx
@@ -31,6 +32,9 @@ else
     alloc_opts="-DTCMALLOC_ROOT=${builddir}/contrib -DHPX_WITH_MALLOC=tcmalloc"
 fi
 
+      # -DHPX_WITH_CXX14=ON
+      # -DHPX_WITH_CUDA_ARCH=sm_61
+
 cmake -DCMAKE_TOOLCHAIN_FILE=${hpxtoolchain}                                        \
       -DCMAKE_BUILD_TYPE=$buildtype                                                 \
       -DCMAKE_EXPORT_COMPILE_COMMANDS=ON                                            \
@@ -40,6 +44,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE=${hpxtoolchain}                                    
       -DHPX_WITH_PARCELPORT_MPI_MULTITHREADED=${HPX_ENABLE_MPI}                     \
       -DHPX_WITH_DATAPAR_VC=ON                                                      \
       -DHPX_WITH_DATAPAR_VC_NO_LIBRARY=ON                                           \
+      -DHPX_WITH_CUDA=OFF                                                           \
       -DVc_ROOT=${builddir}/Vc                                                      \
       -DBOOST_ROOT=$BOOST_ROOT                                                      \
       ${alloc_opts}                                                                 \

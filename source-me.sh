@@ -3,6 +3,8 @@
 #use all available CPUs
 export PARALLEL_BUILD=$((`lscpu -p=cpu | wc -l`-4))
 
+export basedir=$PWD
+
 if [[ `echo $HOSTNAME | grep tave` ]]; then
     echo "compiling for tave, doing additional setup";
     module load craype-mic-knl
@@ -17,6 +19,20 @@ if [[ `echo $HOSTNAME | grep tave` ]]; then
     export mycxxflags="-fPIC -march=knl -ffast-math"
     export myldflags="-fPIC"
     export HPX_ENABLE_MPI=ON
+elif [[ `echo $HOSTNAME | grep daint` ]]; then
+    echo "compiling for daint, doing additional setup";
+    module switch PrgEnv-cray PrgEnv-gnu
+    module load cudatoolkit
+    module load CMake/3.8.1
+    
+    export myarch=${CRAY_CPU_TARGET}
+    export hpxtoolchain=${basedir}/src/hpx/cmake/toolchains/CrayKNL.cmake
+    
+    # special flags for some library builds
+    export mycflags="-fPIC -march=native -ffast-math"
+    export mycxxflags="-fPIC -march=native -ffast-math"
+    export myldflags="-fPIC"
+    export HPX_ENABLE_MPI=ON    
 else
     echo "other machine";
     export myarch=cpu
@@ -40,7 +56,7 @@ fi
 echo "build type: $buildtype"
 export malloc=jemalloc
 
-export basedir=$PWD
+
 export builddir=${basedir}/build-${myarch}-${buildtype}-${malloc}
 export BOOST_ROOT=${builddir}/boost_1_63
 
