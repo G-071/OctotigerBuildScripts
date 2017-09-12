@@ -37,7 +37,7 @@ export LDFLAGS=${myldflags}
 cmake \
 -DCMAKE_PREFIX_PATH=${builddir}/hpx \
 -DHPX_WITH_MALLOC=${malloc} \
--DOCTOTIGER_WITH_CUDA=ON \
+-DOCTOTIGER_WITH_CUDA=${OCTOTIGER_ENABLE_CUDA} \
 -DCMAKE_BUILD_TYPE=${buildtype} \
 -DOCTOTIGER_WITH_SILO=OFF \
 ${basedir}/src/octotiger

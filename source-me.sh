@@ -19,6 +19,7 @@ if [[ `echo $HOSTNAME | grep tave` ]]; then
     export mycxxflags="-fPIC -march=knl -ffast-math"
     export myldflags="-fPIC"
     export HPX_ENABLE_MPI=ON
+    export OCTOTIGER_ENABLE_CUDA=OFF
 elif [[ `echo $HOSTNAME | grep daint` ]]; then
     echo "compiling for daint, doing additional setup";
     module switch PrgEnv-cray PrgEnv-gnu
@@ -32,7 +33,8 @@ elif [[ `echo $HOSTNAME | grep daint` ]]; then
     export mycflags="-fPIC -march=native -ffast-math"
     export mycxxflags="-fPIC -march=native -ffast-math"
     export myldflags="-fPIC"
-    export HPX_ENABLE_MPI=ON    
+    export HPX_ENABLE_MPI=ON
+    export OCTOTIGER_ENABLE_CUDA=ON
 else
     echo "other machine";
     export myarch=cpu
@@ -40,6 +42,7 @@ else
     export mycxxflags="-fPIC -march=native -ffast-math"
     export myldflags="-fPIC"
     export HPX_ENABLE_MPI=OFF
+    export OCTOTIGER_ENABLE_CUDA=OFF
 fi
 
 if [[ ! -z $1 ]]; then
