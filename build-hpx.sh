@@ -15,11 +15,11 @@ cd ${basedir}/src
 if [ ! -d hpx ] ; then
     git clone git@github.com:STEllAR-GROUP/hpx.git
     cd hpx
-    git checkout 1.0.0
+    git checkout master
     cd ..
 fi
-# cd hpx
-# git pull
+cd hpx
+git pull
 cd $basedir
 
 mkdir -p $builddir/hpx
