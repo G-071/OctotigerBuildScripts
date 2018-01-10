@@ -20,7 +20,7 @@ if [ ! -d Vc ] ; then
     cd ..
 fi
 cd Vc
-git pull
+#git pull
 cd ..
 
 mkdir -p ${builddir}/Vc
@@ -33,8 +33,8 @@ cmake \
 -DCMAKE_CXX_COMPILER=${mycxx} \
 -DCMAKE_C_COMPILER=${mycc} \
 -DCMAKE_CXX_FLAGS="${mycxxflags}" \
--DCMAKE_BUILD_TYPE=Release \
 -DCMAKE_INSTALL_PREFIX=. \
+-DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
 -DBUILD_TESTING=OFF \
 ${basedir}/src/Vc
 

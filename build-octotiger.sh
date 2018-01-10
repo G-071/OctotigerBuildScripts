@@ -27,6 +27,7 @@ export CXXFLAGS=${mycxxflags}
 export CFLAGS=${mycflags}
 export LDFLAGS=${myldflags}
 cmake \
+-DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
 -DCMAKE_TOOLCHAIN_FILE=${hpxtoolchain} \
 -DCMAKE_PREFIX_PATH=${builddir}/hpx \
 -DHPX_WITH_MALLOC=${malloc} \
