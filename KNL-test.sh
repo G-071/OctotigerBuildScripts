@@ -7,20 +7,28 @@ basedir=`pwd`
 cd src/octotiger/src
 current_commit=`git rev-parse HEAD`
 cd $basedir
+#Get current HPX commit
+cd src/hpx
+current_commit_hpx=`git rev-parse HEAD`
+cd $basedir
 #Create Test folder
 mkdir "KNL-run-$today"
 cd "KNL-run-$today"
 # Create result files
 echo "# Octotiger commit: $current_commit " > computation_time_results.txt
+echo "# HPX commit: $current_commit_hpx " > computation_time_results.txt
 echo "# Date of run $today" >> computation_time_results.txt
 echo "# Measuring computation time" >> computation_time_results.txt
 echo "#" >> computation_time_results.txt
 echo "#Number HPX threads,All off,m2m on,m2p on,p2p on,p2m on,All on" >> computation_time_results.txt
 echo "# Octotiger commit: $current_commit " > total_time_results.txt
+echo "# HPX commit: $current_commit_hpx " > total_time_results.txt
 echo "# Date of run $today" >> total_time_results.txt
 echo "# Measuring total time" >> total_time_results.txt
 echo "#" >> total_time_results.txt
 echo "#Number HPX threads,All off,m2m on,m2p on,p2p on,p2m on,All on" >> total_time_results.txt
+# Save this version of the script for sanity checks later on
+cp ../KNL-test.sh script-copy.txt
 # Running tests
 for i in `seq 1 64`; do
 	echo "Running test $i - all off..."
