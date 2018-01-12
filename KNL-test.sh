@@ -8,7 +8,7 @@ check_results() {
 		result_correct="$(cat "$1" | grep "$result_name" | sed -e 's/^[ \t]*//' | sed "s/$result_name//g")" 
 		result_actual="$(echo "$2" | grep "$result_name" | sed -e 's/^[ \t]*//' | sed "s/$result_name//g")" 
 		if [ "$result_correct" == "$result_actual" ]; then
-		echo "->$result_name correct!" | tee -a LOG.txt 
+			echo "->$result_name correct!" | tee -a LOG.txt 
 		else
 			echo "==->ERROR: $result_name not correct!" | tee -a LOG.txt
 			echo "==->Actual: $result_correct" | tee -a LOG.txt
@@ -71,6 +71,64 @@ echo "#Number HPX threads,All off,m2m on,m2p on,p2p on,p2m on,All on,All on exce
 cp ../KNL-test.sh used-script-copy.txt
 # Save scenario file for sanity check later on
 cp ../$1 $1
+
+# Save disassembly of performance critical functions for later analysis
+echo "" | tee -a LOG.txt
+echo "Getting assembly/source mix of kernels..." | tee -a LOG.txt
+mkdir kernel-mixed-assembly
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble /s octotiger::fmm::multipole_interactions::m2m_kernel::blocked_interaction_rho" \
+	-ex "quit" > kernel-mixed-assembly/m2m_rho.asm
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble /s octotiger::fmm::multipole_interactions::m2m_kernel::blocked_interaction_non_rho" \
+	-ex "quit" > kernel-mixed-assembly/m2m_non_rho.asm
+echo "Got multipole multipole kernels!" | tee -a LOG.txt
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble /s octotiger::fmm::multipole_interactions::m2p_kernel::blocked_interaction_rho" \
+	-ex "quit" > kernel-mixed-assembly/m2p_rho.asm
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble /s octotiger::fmm::multipole_interactions::m2p_kernel::blocked_interaction_non_rho" \
+	-ex "quit" > kernel-mixed-assembly/m2p_non_rho.asm
+echo "Got multipole monopole kernels!" | tee -a LOG.txt
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble /s octotiger::fmm::monopole_interactions::p2m_kernel::blocked_interaction_rho" \
+	-ex "quit" > kernel-mixed-assembly/p2m_rho.asm
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble /s octotiger::fmm::monopole_interactions::p2m_kernel::blocked_interaction_non_rho" \
+	-ex "quit" > kernel-mixed-assembly/p2m_non_rho.asm
+echo "Got monopole multipole kernels!" | tee -a LOG.txt
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble /s octotiger::fmm::monopole_interactions::p2p_kernel::blocked_interaction" \
+	-ex "quit" > kernel-mixed-assembly/p2p.asm
+echo "Got monopole monopole kernel!" | tee -a LOG.txt
+echo "" | tee -a LOG.txt
+echo "Getting  raw assembly of kernels..." | tee -a LOG.txt
+mkdir kernel-raw-assembly
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble octotiger::fmm::multipole_interactions::m2m_kernel::blocked_interaction_rho" \
+	-ex "quit" > kernel-raw-assembly/m2m_rho.asm
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble octotiger::fmm::multipole_interactions::m2m_kernel::blocked_interaction_non_rho" \
+	-ex "quit" > kernel-raw-assembly/m2m_non_rho.asm
+echo "Got multipole multipole kernels!" | tee -a LOG.txt
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble octotiger::fmm::multipole_interactions::m2p_kernel::blocked_interaction_rho" \
+	-ex "quit" > kernel-raw-assembly/m2p_rho.asm
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble octotiger::fmm::multipole_interactions::m2p_kernel::blocked_interaction_non_rho" \
+	-ex "quit" > kernel-raw-assembly/m2p_non_rho.asm
+echo "Got multipole monopole kernels!" | tee -a LOG.txt
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble octotiger::fmm::monopole_interactions::p2m_kernel::blocked_interaction_rho" \
+	-ex "quit" > kernel-raw-assembly/p2m_rho.asm
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble octotiger::fmm::monopole_interactions::p2m_kernel::blocked_interaction_non_rho" \
+	-ex "quit" > kernel-raw-assembly/p2m_non_rho.asm
+echo "Got monopole multipole kernels!" | tee -a LOG.txt
+gdb ../build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger -batch \
+	-ex "disassemble octotiger::fmm::monopole_interactions::p2p_kernel::blocked_interaction" \
+	-ex "quit" > kernel-raw-assembly/p1p.asm
+echo "Got monopole monopole kernel!" | tee -a LOG.txt
 
 # Need to use declare, otherwise bash assumes it is a string (untyped)
 declare -i errorcount=0
