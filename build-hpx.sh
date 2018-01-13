@@ -52,5 +52,7 @@ cmake -DCMAKE_TOOLCHAIN_FILE=${hpxtoolchain}                                    
       -DHPX_WITH_PARCELPORT_LIBFABRIC=OFF                                           \
       ${basedir}/src/hpx
 
+cp compile_commands.json $basedir/src/hpx/compile_commands.json
+
 make -j${PARALLEL_BUILD} core components VERBOSE=1
 cd $basedir

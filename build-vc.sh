@@ -30,11 +30,23 @@ export CXX=${mycxx}
 export FC=${myfc}
 
 cmake \
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 -DCMAKE_CXX_COMPILER=${mycxx} \
 -DCMAKE_C_COMPILER=${mycc} \
 -DCMAKE_CXX_FLAGS="${mycxxflags}" \
 -DCMAKE_INSTALL_PREFIX=. \
--DCMAKE_EXPORT_COMPILE_COMMANDS=1 \
+${basedir}/src/Vc
+
+cp compile_commands.json $basedir/src/Vc/compile_commands.json
+rm CMakeCache.txt
+
+#workaround to get compile commands...
+cmake \
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+-DCMAKE_CXX_COMPILER=${mycxx} \
+-DCMAKE_C_COMPILER=${mycc} \
+-DCMAKE_CXX_FLAGS="${mycxxflags}" \
+-DCMAKE_INSTALL_PREFIX=. \
 -DBUILD_TESTING=OFF \
 ${basedir}/src/Vc
 
