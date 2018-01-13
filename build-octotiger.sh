@@ -26,12 +26,15 @@ cd $builddir/octotiger
 export CXXFLAGS=${mycxxflags}
 export CFLAGS=${mycflags}
 export LDFLAGS=${myldflags}
+
 cmake \
 -DCMAKE_TOOLCHAIN_FILE=${hpxtoolchain} \
 -DCMAKE_PREFIX_PATH=${builddir}/hpx \
 -DHPX_WITH_MALLOC=${malloc} \
 -DCMAKE_BUILD_TYPE=${buildtype} \
 -DOCTOTIGER_WITH_SILO=OFF \
+-DCMAKE_CXX_COMPILER=/opt/mn/gcc/5.4.0/bin/c++ \
+-DCMAKE_CC_COMPILER=/opt/mn/gcc/5.4.0/bin/c++ \
 ${basedir}/src/octotiger
 
 make -j${PARALLEL_BUILD} VERBOSE=1

@@ -44,6 +44,7 @@ export basedir=$PWD
 export builddir=${basedir}/build-${myarch}-${buildtype}-${malloc}
 export BOOST_ROOT=${builddir}/boost_1_63
 
+module load gcc/5.4.0 cmake/3.7.2
 export mycc=gcc
 export mycxx=g++
 export myfc=gfortran
