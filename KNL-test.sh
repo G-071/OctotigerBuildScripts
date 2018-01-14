@@ -33,10 +33,7 @@ fi
 # Get base dir
 basedir=`pwd`
 # Get current date
-today=`date +%Y-%m-%d_%H:%M:%S`
-# Create Test folder
-result_folder="Testrun-$today"
-mkdir "$result_folder"
+today=`date +%m-%d-%H-%M`
 
 # Get scenario arguments and current commits
 octotiger_args="$(cat "$1" | grep 'octotiger_args' | sed 's/octotiger_args: //g')" 
@@ -45,7 +42,13 @@ current_commit_hpx=`git rev-parse HEAD`
 cd $basedir
 cd src/octotiger/src
 current_commit=`git rev-parse HEAD`
+current_commit_message=`git log --oneline -n 1`
 cd $basedir
+
+# Create Test folder
+result_folder="${current_commit_message}-$today"
+result_folder="$(echo "$result_folder" | sed -e 's/[ \t]/-/g')"
+mkdir "$result_folder"
 
 # Log configuration
 echo "Using scenarion file: $1" | tee "$result_folder/LOG.txt"
