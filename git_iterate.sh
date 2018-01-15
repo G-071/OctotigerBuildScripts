@@ -180,7 +180,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 		echo "--------------------------------" | tee -a "$LOGFILE"
 		
 		TESTRESULTS=()
-		RESULT_STRING=""
+		RESULTSTRING=""
 		BUILD_FAILED=$(cat tmp_current_buildlog.txt | grep "\[100%\]")
 		rm tmp_current_buildlog.txt
 		if [ "$BUILD_FAILED" == "" ]; then
