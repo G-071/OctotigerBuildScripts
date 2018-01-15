@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Checks results - note do not use any variable names from main program...
 check_results() {
         # Loop through all result names
@@ -16,13 +18,14 @@ octotiger_args="$(cat "$1" | grep 'octotiger_args' | sed 's/octotiger_args: //g'
 output="$(./build-cpu-RelWithDebInfo-jemalloc/octotiger/octotiger $octotiger_args)"
 running_time=$(echo "$output" | grep 'Computation' | sed 's/Computation: //g')
 declare -i errorcount=0
-check_results $1 $output
-result_string="$running_time s,"
+check_results $1 "$output"
+result_string=""
 if [ $errorcount -eq 0 ]; then
-	result_string+="TESTS PASSED"
+	result_string+="TESTS PASSED,\t"
 else
-	result_string+="TESTS FAILED [$errorcount]"
+	result_string+="TESTS FAILED,\t"
 fi
+result_string+="$running_time s,\t"
 
 # Return result string by printing to stdout
 echo "$result_string"

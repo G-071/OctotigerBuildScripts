@@ -1,5 +1,17 @@
 #!/bin/bash
 
+cleanup() {
+	echo "" | tee -a "$LOGFILE"
+	echo "Cleanup..." | tee -a "$LOGFILE"
+	cd "$SOURCEPATH"
+	git checkout "$INITIAL_COMMIT"
+	if [ "$STASH_CREATED" == "1" ]; then
+		git stash pop
+	fi
+	cd "$BASEDIR"
+	echo "Cleanup finished..." | tee -a "$LOGFILE"
+}
+
 PRERUNSCRIPT=""
 TESTSCRIPTS=()
 declare -i NUMBER_OF_TESTS=0
@@ -7,8 +19,9 @@ BUILDSCRIPT=""
 STARTCOMMIT=""
 ENDCOMMIT=""
 SOURCEPATH=""
-OUTPUTFILE="Git_iterate_result.txt"
+OUTPUTFILE="git_iterate_result.txt"
 LOGFILE="LOG.txt"
+PREFIX_DIR=""
 for i in "$@"
 do
 case $i in
@@ -21,7 +34,7 @@ case $i in
 	shift # past argument=value
 	;;
 	-sp=*|--sourcepath=*)
-	SRCPATH="${i#*=}"
+	SOURCEPATH="${i#*=}"
 	shift # past argument=value
 	;;
 	-bs=*|--buildscript=*)
@@ -45,6 +58,10 @@ case $i in
 	ENDCOMMIT="${i#*=}"
 	shift # past argument=value
 	;;
+	-p=*|--prefix=*)
+	PREFIX_DIR="${i#*=}"
+	shift # past argument=value
+	;;
 	*)
 	# unknown option
 	;;
@@ -60,10 +77,10 @@ if [ "$BUILDSCRIPT" == "" ]; then
 	echo " => No buildscript specified. Give exactly one test with --buildscript=<script> or -bs=<script>"
 	SHOULD_EXIT=1
 fi
-if [ "$SRCPATH" == "" ]; then
+if [ "$SOURCEPATH" == "" ]; then
 	echo " => No sourcepath specified. Set with --sourcepath=</path/to/repo> or -sp=</path/to/repo>"
 	SHOULD_EXIT=1
-	
+
 fi
 if [ "$STARTCOMMIT" == "" ]; then
 	echo " => No starting commit specified. Set with --startcommit=<integer> or -s=<integer>. Will be used for git checkout HEAD~integer"
@@ -73,37 +90,70 @@ if [ "$ENDCOMMIT" == "" ]; then
 	echo " => No end commit specified. Set with --endcommit=<integer> or -e=<integer>. Will be used for git checkout HEAD~integer"
 	SHOULD_EXIT=1
 fi
-if [ $SHOULD_EXIT -eq 1 ]; then 
+if [ $SHOULD_EXIT -eq 1 ]; then
 	exit 128
+fi
+
+# Just in case user has it the wrong way around
+if [ $STARTCOMMIT -gt $ENDCOMMIT ]; then
+	swapstore=$STARTCOMMIT
+	STARTCOMMIT=$ENDCOMMIT
+	ENDCOMMIT=$swapstore
 fi
 
 # Get base dir
 BASEDIR=`pwd`
 # Get current date
-TODAY=`date +%Y-%m-%d_%H:%M`
+TODAY=`date +%d%m-%H%M`
 # Get initial commit
-cd "$SRCDIR"
+cd "$SOURCEPATH"
+git diff-files --quiet
+if [ $? -ne 0 ];then
+	STASH_CREATED="1"
+	git stash
+fi
 INITIAL_COMMIT=`git rev-parse HEAD`
+# In case we need to bail
+trap cleanup EXIT
 INITIAL_COMMIT_MESSAGE=`git log --oneline -n 1`
+git checkout HEAD~"$STARTCOMMIT"
+START_COMMIT_MESSAGE=`git log --oneline -n 1`
+START_COMMIT_SHORT=`git rev-parse --short HEAD`
+git checkout ${INITIAL_COMMIT}
+git checkout HEAD~"$ENDCOMMIT"
+END_COMMIT_MESSAGE=`git log --oneline -n 1`
+END_COMMIT_SHORT=`git rev-parse --short HEAD`
 cd "$BASEDIR"
 
-echo "#Git-iterate testrun - ${TODAY}" | tee -a "$OUTPUTFILE"
-echo "#Sourcepath  = ${SRCPATH}" | tee -a "$OUTPUTFILE"
-echo "#Source inital commit: ${INITIAL_COMMIT_MESSAGE}" | tee -a "$OUTPUTFILE"
-echo "#Source inital commit: ${INITIAL_COMMIT}" | tee -a "$OUTPUTFILE"
-echo "#Init script = ${PRERUNSCRIPT}" | tee -a "$OUTPUTFILE"
-echo "#buildscript = ${BUILDSCRIPT}" | tee -a "$OUTPUTFILE"
-echo "#From HEAD~${STARTCOMMIT} to HEAD~${ENDCOMMIT} testing following scrips:" | tee -a "$OUTPUTFILE"
+RESULTDIR="${PREFIX_DIR}Iterate_${START_COMMIT_SHORT}-${END_COMMIT_SHORT}_Date-$TODAY"
+mkdir "$RESULTDIR"
+OUTPUTFILE="$RESULTDIR/$OUTPUTFILE"
+LOGFILE="$RESULTDIR/$LOGFILE"
+
+echo "#------------------------------------------------------------------------------------------------------" | tee "$OUTPUTFILE"
+echo "# Git-Iterate > ${RESULTDIR}" | tee "$OUTPUTFILE"
+echo "#------------------------------------------------------------------------------------------------------" | tee -a "$OUTPUTFILE"
+echo "# Init script = ${PRERUNSCRIPT}" | tee -a "$OUTPUTFILE"
+echo "# Buildscript = ${BUILDSCRIPT}" | tee -a "$OUTPUTFILE"
+echo "# Sourcepath  = ${SOURCEPATH}" | tee -a "$OUTPUTFILE"
+echo "# Source recent commit [HEAD]: ${INITIAL_COMMIT}" | tee -a "$OUTPUTFILE"
+echo "# Source recent commit [HEAD]: ${INITIAL_COMMIT_MESSAGE}" | tee -a "$OUTPUTFILE"
+echo "# Test start commit HEAD~${STARTCOMMIT}: ${START_COMMIT_MESSAGE}" | tee -a "$OUTPUTFILE"
+echo "# Test end commit   HEAD~${ENDCOMMIT}: ${END_COMMIT_MESSAGE}" | tee -a "$OUTPUTFILE"
+echo "# From HEAD~${STARTCOMMIT} to HEAD~${ENDCOMMIT} testing following scrips:" | tee -a "$OUTPUTFILE"
 #echo ${TESTSCRIPTS[*]}
 declare -i COUNTER=2
 for script_it in "${TESTSCRIPTS[@]}";do
-	echo "#-->Column $COUNTER: $script_it" | tee -a "$OUTPUTFILE"	
+	echo "#-->Column $COUNTER: $script_it" | tee -a "$OUTPUTFILE"
 	COUNTER=$COUNTER+1
 done
+echo "#------------------------------------------------------------------------------------------------------" | tee -a "$OUTPUTFILE"
 
 echo # newline
 read -p "Continue? (y/n)" -n 1 -r
 echo # newline
+echo "" > current_buildlog.txt
+echo "Starting..." | tee "$LOGFILE"
 if [[ $REPLY =~ ^[Yy]$ ]]; then
 
 	if [ "$PRERUNSCRIPT" != "" ]; then
@@ -116,33 +166,41 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 	fi
 
 	echo "Start iterating git repo..." | tee -a "$LOGFILE"
-	for x in seq `$ENDCOMMIT 1 $STARTCOMMIT`; do
-		cd $SOURCEDIR
+	for x in `seq $STARTCOMMIT 1 $ENDCOMMIT`; do
+		cd "$SOURCEPATH"
 		git checkout ${INITIAL_COMMIT}
 		git checkout HEAD~$x
 		CURRENT_COMMIT_MESSAGE=`git log --oneline -n 1`
-		cd $BASEDIR
+		cd "$BASEDIR"
 		echo "--------------------------------" | tee -a "$LOGFILE"
 		echo "Now at:  $CURRENT_COMMIT_MESSAGE" | tee -a "$LOGFILE"
 		echo "Starting building..." | tee -a "$LOGFILE"
 		echo "Buildscript: $BUILDSCRIPT" | tee -a "$LOGFILE"
-		./${BUILDSCRIPT}
-		echo "Build finished" | tee -a "$LOGFILE"
+		echo "$(bash -x ./${BUILDSCRIPT})" > tmp_current_buildlog.txt
 		echo "--------------------------------" | tee -a "$LOGFILE"
-	
+		
 		TESTRESULTS=()
-		RESULTSTRING="$x, "
-		for i in "${TESTSCRIPTS[@]}";do
-			echo "Starting test..." | tee -a "$LOGFILE"
-			echo "Testscript: $i" | tee -a "$LOGFILE"
-			retn_value=$("./${i}")
-			echo "Test finished!" | tee -a "$LOGFILE"
-			echo "--------------------------------" | tee -a "$LOGFILE"
-			TESTRESULTS+=("$retn_value")
-			RESULTSTRING+="$retn_value"
-		done
+		RESULTSTRING=""
+		BUILD_FAILED=$(cat tmp_current_buildlog.txt | grep "\[100%\]")
+		rm tmp_current_buildlog.txt
+		if [ "$BUILD_FAILED" == "" ]; then
+			RESULTSTRING+="BUILD FAILED, "
+			echo "Buildscript failed" | tee -a "$LOGFILE"
+		else
+			RESULTSTRING+="BUILD SUCCESSFUL, "
+			echo "Buildscript finished" | tee -a "$LOGFILE"
+			for i in "${TESTSCRIPTS[@]}";do
+				echo "Starting test..." | tee -a "$LOGFILE"
+				echo "Testscript: $i" | tee -a "$LOGFILE"
+				retn_value="$(echo $(./${i}))"
+				echo "Test finished!" | tee -a "$LOGFILE"
+				echo "--------------------------------" | tee -a "$LOGFILE"
+				TESTRESULTS+=("$retn_value")
+				RESULTSTRING+="$retn_value"
+			done
+		fi
 		RESULTSTRING+="$CURRENT_COMMIT_MESSAGE"
-		echo "$RESULTSTRING" >> "$OUTPUTFILE"
+		echo -e "$RESULTSTRING" >> "$OUTPUTFILE"
 	done
 fi # exit yes/no dialog
 echo "exiting..."
