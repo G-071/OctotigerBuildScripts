@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Checks results - note do not use any variable names from main program...
 check_results() {
         # Loop through all result names
