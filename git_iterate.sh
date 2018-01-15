@@ -184,10 +184,10 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 		BUILD_FAILED=$(cat tmp_current_buildlog.txt | grep "\[100%\]")
 		rm tmp_current_buildlog.txt
 		if [ "$BUILD_FAILED" == "" ]; then
-			RESULTSTRING+="BUILD FAILED,\t "
+			RESULTSTRING+="BUILD FAILED, "
 			echo "Buildscript failed" | tee -a "$LOGFILE"
 		else
-			RESULTSTRING+="BUILD SUCCESSFUL,\t"
+			RESULTSTRING+="BUILD SUCCESSFUL, "
 			echo "Buildscript finished" | tee -a "$LOGFILE"
 			for i in "${TESTSCRIPTS[@]}";do
 				echo "Starting test..." | tee -a "$LOGFILE"
