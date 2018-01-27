@@ -102,9 +102,9 @@ if [ $STARTCOMMIT -gt $ENDCOMMIT ]; then
 fi
 
 # Get base dir
-BASEDIR=`pwd`
+BASEDIR=$(pwd)
 # Get current date
-TODAY=`date +%d%m-%H%M`
+TODAY=$(date +%d%m-%H%M)
 # Get initial commit
 cd "$SOURCEPATH"
 git diff-files --quiet
@@ -112,17 +112,17 @@ if [ $? -ne 0 ];then
 	STASH_CREATED="1"
 	git stash
 fi
-INITIAL_COMMIT=`git rev-parse HEAD`
+INITIAL_COMMIT=$(git rev-parse HEAD)
 # In case we need to bail
 trap cleanup EXIT
-INITIAL_COMMIT_MESSAGE=`git log --oneline -n 1`
+INITIAL_COMMIT_MESSAGE=$(git log --oneline -n 1)
 git checkout HEAD~"$STARTCOMMIT"
-START_COMMIT_MESSAGE=`git log --oneline -n 1`
-START_COMMIT_SHORT=`git rev-parse --short HEAD`
-git checkout ${INITIAL_COMMIT}
+START_COMMIT_MESSAGE=$(git log --oneline -n 1)
+START_COMMIT_SHORT=$(git rev-parse --short HEAD)
+git checkout "$INITIAL_COMMIT"
 git checkout HEAD~"$ENDCOMMIT"
-END_COMMIT_MESSAGE=`git log --oneline -n 1`
-END_COMMIT_SHORT=`git rev-parse --short HEAD`
+END_COMMIT_MESSAGE=$(git log --oneline -n 1)
+END_COMMIT_SHORT=$(git rev-parse --short HEAD)
 cd "$BASEDIR"
 
 RESULTDIR="${PREFIX_DIR}Iterate_${START_COMMIT_SHORT}-${END_COMMIT_SHORT}_Date-$TODAY"
@@ -166,11 +166,11 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 	fi
 
 	echo "Start iterating git repo..." | tee -a "$LOGFILE"
-	for x in `seq $STARTCOMMIT 1 $ENDCOMMIT`; do
+	for x in $(seq "$STARTCOMMIT" 1 "$ENDCOMMIT"); do
 		cd "$SOURCEPATH"
-		git checkout ${INITIAL_COMMIT}
-		git checkout HEAD~$x
-		CURRENT_COMMIT_MESSAGE=`git log --oneline -n 1`
+		git checkout "$INITIAL_COMMIT"
+		git checkout "HEAD~$x"
+		CURRENT_COMMIT_MESSAGE=$(git log --oneline -n 1)
 		cd "$BASEDIR"
 		echo "--------------------------------" | tee -a "$LOGFILE"
 		echo "Now at:  $CURRENT_COMMIT_MESSAGE" | tee -a "$LOGFILE"
@@ -178,7 +178,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 		echo "Buildscript: $BUILDSCRIPT" | tee -a "$LOGFILE"
 		echo "$(bash -x ./${BUILDSCRIPT})" > tmp_current_buildlog.txt
 		echo "--------------------------------" | tee -a "$LOGFILE"
-		
+
 		TESTRESULTS=()
 		RESULTSTRING=""
 		BUILD_FAILED=$(cat tmp_current_buildlog.txt | grep "\[100%\]")
