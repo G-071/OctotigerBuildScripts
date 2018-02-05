@@ -16,7 +16,8 @@ if [ ! -d hpx ] ; then
     git clone git@github.com:STEllAR-GROUP/hpx.git
     cd hpx
     # git checkout 1.0.0
-    git checkout cuda_clang
+   # git checkout cuda_clang
+    git checkout c9f2c09d9378d920f7d68ce857ca3729014fc601
     cd ..
 fi
 # cd hpx
