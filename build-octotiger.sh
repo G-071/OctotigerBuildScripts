@@ -11,6 +11,11 @@ fi
 #     kill -INT $$
 # fi
 
+# if [[ `echo $HOSTNAME | grep daint` ]]; then
+#     export CC=nvcc
+#     export CXX=nvcc
+# fi
+
 cd ${basedir}/src
 if [ ! -d octotiger ] ; then
     git clone git@github.com:STEllAR-GROUP/octotiger.git
@@ -26,10 +31,13 @@ cd $builddir/octotiger
 export CXXFLAGS=${mycxxflags}
 export CFLAGS=${mycflags}
 export LDFLAGS=${myldflags}
+# -DCMAKE_C_COMPILER=$CC \
+    # -DCMAKE_CXX_COMPILER=$CXX \
+    # -DCMAKE_TOOLCHAIN_FILE=${hpxtoolchain} \
 cmake \
--DCMAKE_TOOLCHAIN_FILE=${hpxtoolchain} \
 -DCMAKE_PREFIX_PATH=${builddir}/hpx \
 -DHPX_WITH_MALLOC=${malloc} \
+-DOCTOTIGER_WITH_CUDA=${OCTOTIGER_ENABLE_CUDA} \
 -DCMAKE_BUILD_TYPE=${buildtype} \
 -DOCTOTIGER_WITH_SILO=OFF \
 ${basedir}/src/octotiger
