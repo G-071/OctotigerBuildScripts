@@ -17,7 +17,7 @@ if [ ! -d hpx ] ; then
     cd hpx
     # git checkout 1.0.0
     #git checkout cuda_clang
-    git checkout c9f2c09d9378d920f7d68ce857ca3729014fc601
+    git checkout master
     cd ..
 fi
 # cd hpx

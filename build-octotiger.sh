@@ -20,7 +20,7 @@ cd ${basedir}/src
 if [ ! -d octotiger ] ; then
     git clone git@github.com:STEllAR-GROUP/octotiger.git
     cd octotiger
-    git checkout kernel_refactoring
+    git checkout master
     cd ..
 fi
 cd octotiger
