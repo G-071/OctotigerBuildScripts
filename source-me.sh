@@ -42,7 +42,7 @@ else
     export mycxxflags="-fPIC -march=native -ffast-math"
     export myldflags="-fPIC"
     export HPX_ENABLE_MPI=OFF
-    export OCTOTIGER_ENABLE_CUDA=ON
+    export OCTOTIGER_ENABLE_CUDA=OFF
 fi
 
 if [[ ! -z $1 ]]; then
